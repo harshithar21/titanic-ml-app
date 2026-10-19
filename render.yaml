@@ -1,0 +1,12 @@
+# Optional "Blueprint" for Render. You can also create the service by hand (see README).
+services:
+  - type: web
+    name: titanic-survival-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python -m ml.train --no-plots
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3

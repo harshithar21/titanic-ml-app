@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Titanic Survival Predictor</title>
+<style>
+  :root { --bg:#f5f7fb; --card:#ffffff; --text:#1c2333; --muted:#5b6478; --border:#d7dce8; --accent:#2e5597; --good:#2e7d32; --bad:#c62828; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#121620; --card:#1b2130; --text:#e8ebf3; --muted:#9aa3b8; --border:#2c3448; --accent:#6c9bf0; --good:#66bb6a; --bad:#ef5350; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+  main { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  @media (max-width:520px){ .grid { grid-template-columns: 1fr; } }
+  label { display:block; font-size:.85rem; color:var(--muted); margin-bottom:4px; }
+  input, select { width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:1rem; }
+  .check { display:flex; align-items:center; gap:8px; margin-top:22px; }
+  .check input { width:auto; }
+  button { margin-top:18px; width:100%; padding:12px; font-size:1rem; font-weight:600; border:0; border-radius:8px; background:var(--accent); color:#fff; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:wait; }
+  #result { margin-top:20px; display:none; }
+  .verdict { font-size:1.3rem; font-weight:700; }
+  .bar { height:14px; border-radius:7px; background:var(--border); overflow:hidden; margin:10px 0 6px; }
+  .bar > div { height:100%; width:0; background:var(--accent); transition: width .5s; }
+  .note { color:var(--muted); font-size:.85rem; margin-top:18px; }
+  #err { color:var(--bad); margin-top:12px; display:none; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Titanic Survival Predictor</h1>
+  <p class="sub">A machine learning model trained on the historical Titanic passenger list. Enter a passenger’s details to see the predicted chance of survival.</p>
+  <div class="card">
+    <div class="grid">
+      <div><label for="pclass">Ticket class</label><select id="pclass"><option value="1">1st</option><option value="2">2nd</option><option value="3" selected>3rd</option></select></div>
+      <div><label for="sex">Sex</label><select id="sex"><option value="male">Male</option><option value="female">Female</option></select></div>
+      <div><label for="age">Age (years, optional)</label><input id="age" type="number" min="0" max="100" step="1" value="30"></div>
+      <div><label for="fare">Fare (£)</label><input id="fare" type="number" min="0" max="600" step="0.01" value="15"></div>
+      <div><label for="sibsp">Siblings / spouses aboard</label><input id="sibsp" type="number" min="0" max="8" value="0"></div>
+      <div><label for="parch">Parents / children aboard</label><input id="parch" type="number" min="0" max="6" value="0"></div>
+      <div><label for="embarked">Port of embarkation</label><select id="embarked"><option value="S">Southampton</option><option value="C">Cherbourg</option><option value="Q">Queenstown</option></select></div>
+      <div class="check"><input id="has_cabin" type="checkbox"><label for="has_cabin" style="margin:0">Cabin recorded</label></div>
+    </div>
+    <button id="go">Predict</button>
+    <div id="err"></div>
+    <div id="result">
+      <div class="verdict" id="verdict"></div>
+      <div class="bar"><div id="fill"></div></div>
+      <div id="detail" class="sub" style="margin:0"></div>
+    </div>
+  </div>
+  <p class="note">This is an educational project, not a real-world decision tool. API documentation: <a href="/docs">/docs</a></p>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+$("go").addEventListener("click", async () => {
+  const btn = $("go"); btn.disabled = true; $("err").style.display = "none";
+  const ageVal = $("age").value;
+  const body = {
+    pclass: Number($("pclass").value), sex: $("sex").value, age: ageVal === "" ? null : Number(ageVal),
+    sibsp: Number($("sibsp").value), parch: Number($("parch").value), fare: Number($("fare").value),
+    embarked: $("embarked").value, has_cabin: $("has_cabin").checked };
+  try {
+    const r = await fetch("/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(Array.isArray(data.detail) ? data.detail.map(d => d.loc.slice(-1)[0] + ": " + d.msg).join("; ") : (data.detail || "Request failed"));
+    const pct = (data.survival_probability * 100).toFixed(1);
+    $("verdict").textContent = data.prediction + " (" + pct + "% chance)";
+    $("verdict").style.color = data.survived ? "var(--good)" : "var(--bad)";
+    $("fill").style.width = pct + "%";
+    $("detail").textContent = "Confidence: " + data.confidence + " · Model: " + data.model;
+    $("result").style.display = "block";
+  } catch (e) { $("err").textContent = e.message; $("err").style.display = "block"; }
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>

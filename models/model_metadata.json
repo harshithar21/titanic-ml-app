@@ -1,0 +1,36 @@
+{
+  "model_name": "Gradient Boosting",
+  "trained_at": "2026-10-19T17:38:38+00:00",
+  "sklearn_version": "1.9.1",
+  "python_version": "3.11.9",
+  "features": [
+    "Pclass",
+    "Sex",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked",
+    "HasCabin"
+  ],
+  "n_train": 712,
+  "n_test": 179,
+  "best_params": {
+    "subsample": 0.7,
+    "n_estimators": 200,
+    "max_depth": 3,
+    "learning_rate": 0.03
+  },
+  "test_metrics": {
+    "accuracy": 0.8045,
+    "precision": 0.7931,
+    "recall": 0.6667,
+    "f1": 0.7244,
+    "roc_auc": 0.8266,
+    "tn": 98,
+    "fp": 12,
+    "fn": 23,
+    "tp": 46,
+    "majority_class_baseline_accuracy": 0.6145
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "model_name": "Gradient Boosting",
+  "trained_at": "2026-10-19T17:38:38+00:00",
+  "sklearn_version": "1.9.1",
+  "python_version": "3.11.9",
+  "features": [
+    "Pclass",
+    "Sex",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked",
+    "HasCabin"
+  ],
+  "n_train": 712,
+  "n_test": 179,
+  "best_params": {
+    "subsample": 0.7,
+    "n_estimators": 200,
+    "max_depth": 3,
+    "learning_rate": 0.03
+  },
+  "test_metrics": {
+    "accuracy": 0.8045,
+    "precision": 0.7931,
+    "recall": 0.6667,
+    "f1": 0.7244,
+    "roc_auc": 0.8266,
+    "tn": 98,
+    "fp": 12,
+    "fn": 23,
+    "tp": 46,
+    "majority_class_baseline_accuracy": 0.6145
+  },
+  "cv_default": [
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.7977642076233625,
+      "f1": 0.7327872696293749,
+      "roc_auc": 0.8585989862047855
+    },
+    {
+      "model": "Random Forest",
+      "accuracy": 0.8146360681571949,
+      "f1": 0.7548051011911601,
+      "roc_auc": 0.8704481465649178
+    },
+    {
+      "model": "Gradient Boosting",
+      "accuracy": 0.8258248793460062,
+      "f1": 0.7606848060930234,
+      "roc_auc": 0.8899935219488511
+    }
+  ],
+  "cv_tuned": [
+    {
+      "model": "Logistic Regression",
+      "cv_roc_auc": 0.8585989862047855,
+      "best_params": {
+        "C": 1
+      }
+    },
+    {
+      "model": "Random Forest",
+      "cv_roc_auc": 0.8824294934718132,
+      "best_params": {
+        "n_estimators": 200,
+        "min_samples_leaf": 2,
+        "max_features": "sqrt",
+        "max_depth": 8
+      }
+    },
+    {
+      "model": "Gradient Boosting",
+      "cv_roc_auc": 0.8906803932744373,
+      "best_params": {
+        "subsample": 0.7,
+        "n_estimators": 200,
+        "max_depth": 3,
+        "learning_rate": 0.03
+      }
+    }
+  ],
+  "permutation_importance": {
+    "Sex": 0.2051,
+    "Pclass": 0.033,
+    "Age": 0.026,
+    "SibSp": 0.0242,
+    "Fare": 0.0148,
+    "HasCabin": 0.0127,
+    "Embarked": 0.0043,
+    "Parch": 0.002
+  }
+}
